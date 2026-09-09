@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id                 String             @id @default(cuid())
+  slug               String             @unique
+  fullName           String
+  designation        String
+  companyName        String
+  bio                String?
+  profilePhoto       String?
+  companyLogo        String?
+  coverPhotos        String?            // JSON stringified Array<string> of banner/work photos for the slide
+  phone              String?
+  whatsapp           String?
+  email              String?
+  website            String?
+  address            String?
+  googleMapsUrl      String?
+  instagram          String?
+  facebook           String?
+  linkedin           String?
+  youtube            String?
+  twitter            String?
+  companyDescription String?
+  businessCategory   String?
+  customLinks        String?            // JSON stringified Array<{ id, title, url, icon }>
+  status             String             @default("ACTIVE") // "ACTIVE" | "INACTIVE"
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  analytics          ProfileAnalytics[]
+}
+
+model ProfileAnalytics {
+  id         String   @id @default(cuid())
+  clientId   String
+  client     Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  viewedAt   DateTime @default(now())
+  deviceType String   @default("Mobile") // "Mobile" | "Desktop" | "Tablet"
+  referrer   String?
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String   @default("Admin")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model PlatformSettings {
+  id           String   @id @default("default")
+  brandName    String   @default("DigitalCard")
+  supportEmail String?
+  updatedAt    DateTime @updatedAt
+}
