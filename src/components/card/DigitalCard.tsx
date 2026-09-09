@@ -634,13 +634,9 @@ export default function DigitalCard({ client, baseUrl = '', isPreview = false }:
               </button>
             </div>
 
-            {/* Connections & NFC Telemetry Indicator */}
+            {/* NFC Verification Badge */}
             <div className="mt-2.5 flex items-center gap-2 text-xs">
-              <span className="font-medium text-slate-600 hover:text-slate-900 cursor-pointer">
-                500+ connections
-              </span>
-              <span className="text-slate-300">•</span>
-              <span className="inline-flex items-center gap-1 text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md font-medium text-[11px] border border-emerald-200/60">
+              <span className="inline-flex items-center gap-1 text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-md font-medium text-[11px] border border-emerald-200/60">
                 <ShieldCheck className="w-3 h-3 text-emerald-600" />
                 Permanent NFC Verified
               </span>
