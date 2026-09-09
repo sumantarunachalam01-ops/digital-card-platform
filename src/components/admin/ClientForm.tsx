@@ -42,6 +42,53 @@ interface ClientFormProps {
   loading?: boolean;
 }
 
+// Helper to compress and resize large photos from mobile cameras before upload
+const compressImageBeforeUpload = (file: File, maxDim = 1200, quality = 0.85): Promise<File> => {
+  return new Promise((resolve) => {
+    if (!file.type.startsWith('image/') || file.type.includes('svg') || file.type.includes('gif')) {
+      return resolve(file);
+    }
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return resolve(file);
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) return resolve(file);
+            const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, '.jpg'), {
+              type: 'image/jpeg',
+              lastModified: Date.now(),
+            });
+            resolve(compressedFile);
+          },
+          'image/jpeg',
+          quality
+        );
+      };
+      img.onerror = () => resolve(file);
+    };
+    reader.onerror = () => resolve(file);
+  });
+};
+
 export default function ClientForm({
   initialData,
   isEditing = false,
@@ -155,9 +202,10 @@ export default function ClientForm({
     updateCoverPhotos(copy);
   };
 
-  const handleCoverUpload = async (file: File) => {
+  const handleCoverUpload = async (rawFile: File) => {
     setUploadingCover(true);
     try {
+      const file = await compressImageBeforeUpload(rawFile, 1400, 0.85);
       const form = new FormData();
       form.append('file', file);
       const res = await fetch('/api/upload', {
@@ -168,7 +216,7 @@ export default function ClientForm({
       if (data.url) {
         addCoverPhoto(data.url);
       } else {
-        showToast('Image upload failed', 'error');
+        showToast(data.error || 'Image upload failed', 'error');
       }
     } catch {
       showToast('Error uploading image', 'error');
@@ -249,12 +297,13 @@ export default function ClientForm({
   }, []);
 
   // Image Upload handler
-  const handleFileUpload = async (file: File, target: 'profilePhoto' | 'companyLogo') => {
+  const handleFileUpload = async (rawFile: File, target: 'profilePhoto' | 'companyLogo') => {
     const isPhoto = target === 'profilePhoto';
     if (isPhoto) setUploadingPhoto(true);
     else setUploadingLogo(true);
 
     try {
+      const file = await compressImageBeforeUpload(rawFile, 1000, 0.85);
       const form = new FormData();
       form.append('file', file);
       const res = await fetch('/api/upload', {
@@ -267,7 +316,7 @@ export default function ClientForm({
         updateField(target, data.url);
         showToast(`${isPhoto ? 'Profile photo' : 'Company logo'} uploaded successfully`);
       } else {
-        showToast('Image upload failed', 'error');
+        showToast(data.error || 'Image upload failed', 'error');
       }
     } catch {
       showToast('Error uploading image', 'error');

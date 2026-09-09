@@ -18,40 +18,64 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
-    // 1. If Vercel Blob Storage is connected (BLOB_READ_WRITE_TOKEN configured)
+    // 1. If Vercel Blob Storage is connected (BLOB_READ_WRITE_TOKEN configured in Vercel)
     if (process.env.BLOB_READ_WRITE_TOKEN) {
-      const originalExt = path.extname(file.name) || '.jpg';
-      const safeName = `uploads/${Date.now()}-${Math.random().toString(36).substring(2, 8)}${originalExt}`;
-      const blob = await put(safeName, file, {
-        access: 'public',
-      });
-      return NextResponse.json({
-        success: true,
-        url: blob.url,
-      });
+      try {
+        const originalExt = path.extname(file.name) || '.jpg';
+        const safeName = `uploads/${Date.now()}-${Math.random().toString(36).substring(2, 8)}${originalExt}`;
+        const blob = await put(safeName, file, {
+          access: 'public',
+        });
+        return NextResponse.json({
+          success: true,
+          url: blob.url,
+        });
+      } catch (blobErr) {
+        console.warn('Vercel Blob upload failed, falling back to Data URL:', blobErr);
+      }
     }
 
-    // 2. Local fallback storage (for local development)
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Ensure uploads directory exists
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-    await mkdir(uploadsDir, { recursive: true });
+    // 2. On Vercel / Serverless (where filesystem is read-only), return optimized Data URL
+    if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+      const mimeType = file.type || 'image/jpeg';
+      const base64Data = buffer.toString('base64');
+      const dataUrl = `data:${mimeType};base64,${base64Data}`;
+      return NextResponse.json({
+        success: true,
+        url: dataUrl,
+      });
+    }
 
-    // Clean file extension and create unique filename
-    const originalExt = path.extname(file.name) || '.jpg';
-    const safeName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}${originalExt}`;
-    const filePath = path.join(uploadsDir, safeName);
+    // 3. Local disk storage (for local development on your machine)
+    try {
+      const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+      await mkdir(uploadsDir, { recursive: true });
 
-    await writeFile(filePath, buffer);
+      const originalExt = path.extname(file.name) || '.jpg';
+      const safeName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}${originalExt}`;
+      const filePath = path.join(uploadsDir, safeName);
 
-    const publicUrl = `/uploads/${safeName}`;
+      await writeFile(filePath, buffer);
 
-    return NextResponse.json({
-      success: true,
-      url: publicUrl,
-    });
+      const publicUrl = `/uploads/${safeName}`;
+
+      return NextResponse.json({
+        success: true,
+        url: publicUrl,
+      });
+    } catch (fsErr) {
+      console.warn('Local disk write failed, falling back to Data URL:', fsErr);
+      const mimeType = file.type || 'image/jpeg';
+      const base64Data = buffer.toString('base64');
+      const dataUrl = `data:${mimeType};base64,${base64Data}`;
+      return NextResponse.json({
+        success: true,
+        url: dataUrl,
+      });
+    }
   } catch (error) {
     console.error('Upload error:', error);
     return NextResponse.json({ error: 'File upload failed' }, { status: 500 });
