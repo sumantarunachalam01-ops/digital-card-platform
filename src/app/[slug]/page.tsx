@@ -4,8 +4,7 @@ import { Metadata } from 'next';
 import prisma from '@/lib/prisma';
 import DigitalCard from '@/components/card/DigitalCard';
 import { headers } from 'next/headers';
-import Link from 'next/link';
-import { AlertCircle, Home, ShieldAlert } from 'lucide-react';
+import { AlertCircle, ShieldAlert } from 'lucide-react';
 import { ClientData } from '@/types';
 
 interface PageProps {
@@ -66,16 +65,9 @@ export default async function ClientProfilePage({ params }: PageProps) {
             <AlertCircle className="w-7 h-7" />
           </div>
           <h1 className="text-xl font-bold text-slate-900 mb-2">Digital Card Not Found</h1>
-          <p className="text-xs text-slate-600 mb-6 leading-relaxed">
+          <p className="text-xs text-slate-600 leading-relaxed">
             The requested digital business card (<span className="text-slate-900 font-mono font-medium">/{slug}</span>) does not exist or may have been moved.
           </p>
-          <Link
-            href="/admin"
-            className="inline-flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-all active:scale-95 shadow-xs"
-          >
-            <Home className="w-4 h-4" />
-            <span>Return to Dashboard</span>
-          </Link>
         </div>
       </div>
     );
@@ -90,16 +82,9 @@ export default async function ClientProfilePage({ params }: PageProps) {
             <ShieldAlert className="w-7 h-7" />
           </div>
           <h1 className="text-xl font-bold text-slate-900 mb-2">Card Currently Unavailable</h1>
-          <p className="text-xs text-slate-600 mb-6 leading-relaxed">
+          <p className="text-xs text-slate-600 leading-relaxed">
             This digital business card is temporarily inactive. Please contact the card owner directly or try again later.
           </p>
-          <Link
-            href="/admin"
-            className="inline-flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-all active:scale-95 shadow-xs"
-          >
-            <Home className="w-4 h-4" />
-            <span>Return to Dashboard</span>
-          </Link>
         </div>
       </div>
     );

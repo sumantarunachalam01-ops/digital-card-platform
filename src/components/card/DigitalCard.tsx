@@ -411,16 +411,6 @@ export default function DigitalCard({ client, baseUrl = '', isPreview = false }:
               <Share2 className="w-4 h-4" />
             </button>
 
-            {/* Edit / Manage Profile Shortcut */}
-            <a
-              href="/admin/clients"
-              className="p-2 rounded-full hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition-colors"
-              title="Edit Profile & Manage URLs in Admin Studio"
-              aria-label="Edit Profile & Manage URLs"
-            >
-              <ExternalLink className="w-4 h-4" />
-            </a>
-
             {/* Save Contact Pill */}
             <button
               onClick={handleAddToContacts}
