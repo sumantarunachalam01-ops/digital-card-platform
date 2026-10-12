@@ -52,12 +52,12 @@ interface DigitalCardProps {
 export default function DigitalCard({ client, baseUrl = '', isPreview = false }: DigitalCardProps) {
   // -------------------------------------------------------------
   // Greeting Intro Animation Sequence (Apple / Luxury NFC Tap Style)
-  // Stage flow: 'hello' (0-1.3s) -> 'name' (1.3-3.0s) -> 'fading_out' (3.0-3.6s) -> 'completed'
+  // Stage flow: 'hello' (0-1.5s) -> 'name' (1.5-3.8s) -> 'fading_out' (3.8-4.6s) -> 'completed'
   // -------------------------------------------------------------
-  const [greetingStage, setGreetingStage] = useState<'hello' | 'name' | 'fading_out' | 'completed'>(
-    isPreview ? 'completed' : 'hello'
+  const [greetingStage, setGreetingStage] = useState<'active' | 'fading_out' | 'completed'>(
+    isPreview ? 'completed' : 'active'
   );
-  const [greetingVisibleText, setGreetingVisibleText] = useState<'hello' | 'name'>('hello');
+  const [greetingStep, setGreetingStep] = useState<'hello' | 'name'>('hello');
   const greetingTimerRef = useRef<NodeJS.Timeout[]>([]);
 
   const clearGreetingTimers = () => {
@@ -67,24 +67,23 @@ export default function DigitalCard({ client, baseUrl = '', isPreview = false }:
 
   const startGreetingSequence = useCallback(() => {
     clearGreetingTimers();
-    setGreetingStage('hello');
-    setGreetingVisibleText('hello');
+    setGreetingStage('active');
+    setGreetingStep('hello');
 
-    // Timer 1: Transition from "Hello" to "I'm {Name}" at ~1.3s
+    // Timer 1: Smooth cross-fade from "Hello" to "I'm {Name}" at 2000ms
     const t1 = setTimeout(() => {
-      setGreetingVisibleText('name');
-      setGreetingStage('name');
-    }, 1300);
+      setGreetingStep('name');
+    }, 2000);
 
-    // Timer 2: Start fading out the greeting screen at ~3.0s
+    // Timer 2: Start smooth fade out of the entire overlay at 4800ms
     const t2 = setTimeout(() => {
       setGreetingStage('fading_out');
-    }, 3000);
+    }, 4800);
 
-    // Timer 3: Completely complete the greeting overlay at ~3.6s
+    // Timer 3: Completely finish and unmount greeting overlay at 5600ms
     const t3 = setTimeout(() => {
       setGreetingStage('completed');
-    }, 3600);
+    }, 5600);
 
     greetingTimerRef.current = [t1, t2, t3];
   }, []);
@@ -94,7 +93,7 @@ export default function DigitalCard({ client, baseUrl = '', isPreview = false }:
     setGreetingStage('fading_out');
     const t = setTimeout(() => {
       setGreetingStage('completed');
-    }, 300);
+    }, 350);
     greetingTimerRef.current = [t];
   };
 
@@ -479,7 +478,7 @@ export default function DigitalCard({ client, baseUrl = '', isPreview = false }:
       {greetingStage !== 'completed' && (
         <div
           onClick={skipGreeting}
-          className={`fixed inset-0 z-50 bg-[#050608] flex flex-col items-center justify-between p-6 sm:p-10 select-none cursor-pointer transition-all duration-700 ease-out ${
+          className={`fixed inset-0 z-[100] bg-[#050608] flex flex-col items-center justify-between p-6 sm:p-10 select-none cursor-pointer transition-all duration-700 ease-out ${
             greetingStage === 'fading_out' ? 'opacity-0 scale-105 pointer-events-none' : 'opacity-100 scale-100'
           }`}
           title="Tap anywhere to skip greeting"
@@ -500,30 +499,42 @@ export default function DigitalCard({ client, baseUrl = '', isPreview = false }:
             </div>
           </div>
 
-          {/* Centralized Typography Sequence */}
-          <div className="relative z-10 max-w-lg mx-auto text-center px-4 flex flex-col items-center justify-center my-auto min-h-[180px]">
-            {greetingVisibleText === 'hello' ? (
-              <div className="animate-in fade-in zoom-in-95 duration-700 ease-out flex flex-col items-center">
-                <h1 className="text-5xl sm:text-7xl font-extralight tracking-wider text-white drop-shadow-[0_0_35px_rgba(255,255,255,0.35)]">
-                  Hello
-                </h1>
-                <div className="w-12 h-0.5 bg-gradient-to-r from-transparent via-white/50 to-transparent mt-5 rounded-full" />
-              </div>
-            ) : (
-              <div className="animate-in fade-in zoom-in-95 duration-700 ease-out flex flex-col items-center">
-                <span className="text-xs sm:text-sm font-mono uppercase tracking-[0.25em] text-zinc-400 mb-2">
-                  Welcome to profile
-                </span>
-                <h1 className="text-3xl sm:text-5xl font-semibold tracking-tight text-white drop-shadow-[0_0_30px_rgba(255,255,255,0.25)]">
-                  I&apos;m {client.fullName || 'there'}
-                </h1>
-                {client.designation && (
-                  <p className="text-sm sm:text-base text-zinc-400 mt-2 font-normal max-w-sm">
-                    {client.designation} {client.companyName ? `• ${client.companyName}` : ''}
-                  </p>
-                )}
-              </div>
-            )}
+          {/* Centralized Smooth Cross-Fade Typography Sequence */}
+          <div className="relative z-10 max-w-lg mx-auto text-center px-4 flex items-center justify-center my-auto min-h-[220px] w-full">
+            {/* Step 1: "Hello" Screen */}
+            <div
+              className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-1000 ease-in-out ${
+                greetingStep === 'hello'
+                  ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
+                  : 'opacity-0 -translate-y-6 scale-95 pointer-events-none'
+              }`}
+            >
+              <h1 className="text-5xl sm:text-7xl font-extralight tracking-wider text-white drop-shadow-[0_0_35px_rgba(255,255,255,0.35)]">
+                Hello
+              </h1>
+              <div className="w-12 h-0.5 bg-gradient-to-r from-transparent via-white/50 to-transparent mt-5 rounded-full" />
+            </div>
+
+            {/* Step 2: "I'm {client.fullName}" Screen */}
+            <div
+              className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-1000 ease-in-out ${
+                greetingStep === 'name'
+                  ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
+                  : 'opacity-0 translate-y-6 scale-95 pointer-events-none'
+              }`}
+            >
+              <span className="text-xs sm:text-sm font-mono uppercase tracking-[0.25em] text-zinc-400 mb-2">
+                Welcome to profile
+              </span>
+              <h1 className="text-3xl sm:text-5xl font-semibold tracking-tight text-white drop-shadow-[0_0_30px_rgba(255,255,255,0.25)]">
+                I&apos;m {client.fullName || 'there'}
+              </h1>
+              {client.designation && (
+                <p className="text-sm sm:text-base text-zinc-400 mt-2 font-normal max-w-sm px-4">
+                  {client.designation} {client.companyName ? `• ${client.companyName}` : ''}
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Bottom Tap / Skip Bar */}
