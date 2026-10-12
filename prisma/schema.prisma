@@ -31,6 +31,9 @@ model Client {
   companyDescription String?
   businessCategory   String?
   customLinks        String?            // JSON stringified Array<{ id, title, url, icon }>
+  passwordHash       String?            // Password hash for client portal self-login
+  resetToken         String?            // 6-digit or secure token for password reset
+  resetTokenExpiry   DateTime?          // Expiration for password reset token
   status             String             @default("ACTIVE") // "ACTIVE" | "INACTIVE"
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
@@ -48,12 +51,14 @@ model ProfileAnalytics {
 }
 
 model AdminUser {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  passwordHash String
-  name         String   @default("Admin")
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id               String    @id @default(cuid())
+  email            String    @unique
+  passwordHash     String
+  name             String    @default("Admin")
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 }
 
 model PlatformSettings {

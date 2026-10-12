@@ -50,7 +50,11 @@ export default function AdminDashboardPage() {
       const authRes = await fetch('/api/auth/me');
       const authData = await authRes.json();
       if (!authData.authenticated) {
-        router.replace('/admin/login');
+        router.replace('/login');
+        return;
+      }
+      if (authData.user.role === 'CLIENT') {
+        router.replace('/portal');
         return;
       }
 

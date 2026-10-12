@@ -11,6 +11,9 @@ export interface SessionPayload {
   userId: string;
   email: string;
   name: string;
+  role: 'ADMIN' | 'CLIENT';
+  clientId?: string;
+  slug?: string;
 }
 
 export async function signSession(payload: SessionPayload): Promise<string> {
@@ -30,11 +33,23 @@ export async function verifySession(token: string): Promise<SessionPayload | nul
   }
 }
 
-export async function getCurrentAdmin(): Promise<SessionPayload | null> {
+export async function getCurrentUser(): Promise<SessionPayload | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
   if (!token) return null;
   return await verifySession(token);
+}
+
+export async function getCurrentAdmin(): Promise<SessionPayload | null> {
+  const user = await getCurrentUser();
+  if (!user || user.role !== 'ADMIN') return null;
+  return user;
+}
+
+export async function getCurrentClient(): Promise<SessionPayload | null> {
+  const user = await getCurrentUser();
+  if (!user || user.role !== 'CLIENT') return null;
+  return user;
 }
 
 export async function setAdminSession(payload: SessionPayload): Promise<void> {

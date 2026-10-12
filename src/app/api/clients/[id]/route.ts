@@ -95,6 +95,9 @@ export async function PUT(request: Request, context: Context) {
         businessCategory: body.businessCategory !== undefined ? body.businessCategory : existing.businessCategory,
         customLinks: body.customLinks !== undefined ? (typeof body.customLinks === 'object' ? JSON.stringify(body.customLinks) : body.customLinks) : existing.customLinks,
         status: body.status !== undefined ? (body.status === 'INACTIVE' ? 'INACTIVE' : 'ACTIVE') : existing.status,
+        ...(body.password && body.password.trim().length >= 6
+          ? { passwordHash: await (await import('bcryptjs')).default.hash(body.password.trim(), 10) }
+          : {}),
       },
     });
 

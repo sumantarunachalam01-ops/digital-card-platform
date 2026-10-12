@@ -24,10 +24,10 @@ export default function AdminSidebar() {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
       showToast('Logged out successfully');
-      router.push('/admin/login');
+      router.push('/login');
       router.refresh();
     } catch {
-      router.push('/admin/login');
+      router.push('/login');
     }
   };
 

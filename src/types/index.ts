@@ -29,6 +29,7 @@ export interface ClientData {
   companyDescription?: string | null;
   businessCategory?: string | null;
   customLinks?: string | CustomLink[] | null;
+  password?: string | null;
   status: 'ACTIVE' | 'INACTIVE';
   createdAt?: Date | string;
   updatedAt?: Date | string;
@@ -41,6 +42,15 @@ export interface ClientData {
   _count?: {
     analytics: number;
   };
+}
+
+export interface UserSession {
+  userId: string;
+  email: string;
+  name: string;
+  role: 'ADMIN' | 'CLIENT';
+  clientId?: string;
+  slug?: string;
 }
 
 export interface ClientStats {
