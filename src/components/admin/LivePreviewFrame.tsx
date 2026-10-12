@@ -35,7 +35,7 @@ export default function LivePreviewFrame({ client, baseUrl }: LivePreviewFramePr
         </div>
 
         {/* Screen Container */}
-        <div className="w-full h-full bg-[#f4f5f7] rounded-[38px] overflow-y-auto relative custom-scrollbar">
+        <div className="w-full h-full bg-[#07080B] rounded-[38px] overflow-y-auto relative custom-scrollbar">
           {/* Renders the EXACT SAME centralized template */}
           <DigitalCard client={client} baseUrl={baseUrl} isPreview={true} />
         </div>

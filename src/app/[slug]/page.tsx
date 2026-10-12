@@ -59,14 +59,14 @@ export default async function ClientProfilePage({ params }: PageProps) {
   // 2. Error handling: Nonexistent card
   if (!client) {
     return (
-      <div className="min-h-screen bg-[#f3f2ef] text-slate-900 flex flex-col items-center justify-center p-6 text-center">
-        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-8 max-w-sm w-full flex flex-col items-center">
-          <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center mb-4">
+      <div className="min-h-screen bg-[#07080B] text-slate-100 flex flex-col items-center justify-center p-6 text-center">
+        <div className="bg-[#0F1218] rounded-3xl border border-white/10 shadow-2xl p-8 max-w-sm w-full flex flex-col items-center">
+          <div className="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center mb-4">
             <AlertCircle className="w-7 h-7" />
           </div>
-          <h1 className="text-xl font-bold text-slate-900 mb-2">Digital Card Not Found</h1>
-          <p className="text-xs text-slate-600 leading-relaxed">
-            The requested digital business card (<span className="text-slate-900 font-mono font-medium">/{slug}</span>) does not exist or may have been moved.
+          <h1 className="text-xl font-bold text-white mb-2">Digital Card Not Found</h1>
+          <p className="text-xs text-zinc-400 leading-relaxed">
+            The requested digital business card (<span className="text-white font-mono font-medium">/{slug}</span>) does not exist or may have been moved.
           </p>
         </div>
       </div>
@@ -76,13 +76,13 @@ export default async function ClientProfilePage({ params }: PageProps) {
   // 3. Status handling: Inactive card
   if (client.status === 'INACTIVE') {
     return (
-      <div className="min-h-screen bg-[#f3f2ef] text-slate-900 flex flex-col items-center justify-center p-6 text-center">
-        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-8 max-w-sm w-full flex flex-col items-center">
-          <div className="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center mb-4">
+      <div className="min-h-screen bg-[#07080B] text-slate-100 flex flex-col items-center justify-center p-6 text-center">
+        <div className="bg-[#0F1218] rounded-3xl border border-white/10 shadow-2xl p-8 max-w-sm w-full flex flex-col items-center">
+          <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mb-4">
             <ShieldAlert className="w-7 h-7" />
           </div>
-          <h1 className="text-xl font-bold text-slate-900 mb-2">Card Currently Unavailable</h1>
-          <p className="text-xs text-slate-600 leading-relaxed">
+          <h1 className="text-xl font-bold text-white mb-2">Card Currently Unavailable</h1>
+          <p className="text-xs text-zinc-400 leading-relaxed">
             This digital business card is temporarily inactive. Please contact the card owner directly or try again later.
           </p>
         </div>
