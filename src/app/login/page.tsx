@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Sparkles, Lock, Mail, Loader2, ArrowRight, ShieldCheck, ArrowLeft, KeyRound } from 'lucide-react';
@@ -13,22 +13,6 @@ export default function UnifiedLoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-
-  // Check if already authenticated
-  useEffect(() => {
-    fetch('/api/auth/me')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.authenticated && data.user) {
-          if (data.user.role === 'ADMIN') {
-            router.replace('/admin');
-          } else {
-            router.replace('/portal');
-          }
-        }
-      })
-      .catch(() => {});
-  }, [router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -170,17 +154,31 @@ export default function UnifiedLoginPage() {
         <div className="mt-6 pt-5 border-t border-white/[0.08] text-center">
           <div className="flex items-center justify-center gap-1.5 text-[11px] font-semibold text-zinc-300 mb-2">
             <KeyRound className="w-3.5 h-3.5 text-zinc-400" />
-            <span>Default Access Credentials</span>
+            <span>Default Access Credentials (Click to fill)</span>
           </div>
-          <div className="flex flex-col gap-1 text-[11px] font-mono text-zinc-400">
-            <div>
-              <span className="text-zinc-500">Admin: </span>
-              <span className="text-zinc-300 font-medium">admin@digitalcard.com</span> / admin123
-            </div>
-            <div>
-              <span className="text-zinc-500">Card Owner: </span>
-              <span className="text-zinc-300 font-medium">sumantarunachalam@gmail.com</span> / card123
-            </div>
+          <div className="flex flex-col gap-1.5 text-[11px] font-mono text-zinc-400">
+            <button
+              type="button"
+              onClick={() => {
+                setEmail('admin@digitalcard.com');
+                setPassword('admin123');
+              }}
+              className="px-2 py-1 rounded-lg bg-white/[0.03] hover:bg-white/[0.08] border border-white/5 transition-colors text-left flex justify-between items-center cursor-pointer"
+            >
+              <span><span className="text-zinc-500 font-sans">Admin: </span>admin@digitalcard.com</span>
+              <span className="text-zinc-500 text-[10px]">fill</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setEmail('sumantarunachalam@gmail.com');
+                setPassword('card123');
+              }}
+              className="px-2 py-1 rounded-lg bg-white/[0.03] hover:bg-white/[0.08] border border-white/5 transition-colors text-left flex justify-between items-center cursor-pointer"
+            >
+              <span><span className="text-zinc-500 font-sans">Card Owner: </span>sumantarunachalam@gmail.com</span>
+              <span className="text-zinc-500 text-[10px]">fill</span>
+            </button>
           </div>
         </div>
       </div>
